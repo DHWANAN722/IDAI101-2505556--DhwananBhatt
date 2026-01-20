@@ -35,9 +35,7 @@ api_key = st.sidebar.text_input("Enter Gemini API Key", type="password")
 
 if api_key:
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash')
-
-    # 3. USER INPUTS
+    model = genai.GenerativeModel('gemini-2.5-flash')    # 3. USER INPUTS
     col1, col2 = st.columns(2)
     with col1:
         location = st.selectbox("Select your region", ["Canada", "India", "Ghana", "Other"])
