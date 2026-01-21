@@ -4,133 +4,126 @@ import random
 
 # ---------- PAGE CONFIG ----------
 st.set_page_config(
-    page_title="SMART FARM AI",
-    page_icon="🚜",
+    page_title="Smart Farm AI",
+    page_icon="🌾",
     layout="wide"
 )
 
-# ---------- NEON / GRADIENT STYLES ----------
+# ---------- CLEAN STYLING ----------
 st.markdown("""
 <style>
 body {
-    background: linear-gradient(120deg, #0f2027, #203a43, #2c5364);
+    background-color: #f4f6f8;
 }
-.main {
-    background: rgba(255,255,255,0.05);
-}
-h1, h2, h3, h4 {
-    color: #00ffcc;
+h1 {
+    color: #2e7d32;
 }
 .card {
-    background: rgba(0,0,0,0.6);
+    background-color: #ffffff;
     padding: 20px;
-    border-radius: 15px;
-    border: 2px solid #00ffcc;
-    color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
     margin-bottom: 20px;
 }
 .footer {
     text-align: center;
-    color: #cccccc;
+    color: #777777;
+    font-size: 14px;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- SIDEBAR (ACCOUNT / SETTINGS) ----------
-st.sidebar.title("👤 Account Settings")
+# ---------- TITLE ----------
+st.markdown("<h1>🌾 Smart Farm AI</h1>", unsafe_allow_html=True)
+st.write("A simple web app that provides region-specific farming advice.")
 
-username = st.sidebar.text_input("Username", "Farmer01")
-language = st.sidebar.selectbox("Language", ["English", "Hindi", "Marathi"])
-theme = st.sidebar.selectbox("Theme", ["Neon", "Dark", "Green"])
-notifications = st.sidebar.checkbox("Enable Alerts", True)
+# ---------- LANGUAGE SELECTION (REAL, NOT FAKE) ----------
+language = st.selectbox("Select Language", ["English", "Hindi", "Marathi"])
 
-st.sidebar.markdown("---")
-st.sidebar.write("Logged in as:", username)
+def translate(text):
+    translations = {
+        "Hindi": {
+            "Advice": "सलाह",
+            "Resource Analysis": "संसाधन विश्लेषण"
+        },
+        "Marathi": {
+            "Advice": "सल्ला",
+            "Resource Analysis": "संसाधन विश्लेषण"
+        }
+    }
+    return translations.get(language, {}).get(text, text)
 
-# ---------- MAIN TITLE ----------
-st.markdown("<h1>🚜 SMART FARM AI</h1>", unsafe_allow_html=True)
-st.markdown("### Neon-powered smart farming assistant")
+st.markdown("---")
 
-# ---------- INPUT SECTION ----------
+# ---------- INPUTS ----------
 col1, col2 = st.columns(2)
 
 with col1:
     location = st.selectbox(
-        "📍 Select Location",
+        "Location",
         ["Maharashtra, India", "Punjab, India", "Ghana", "Canada"]
     )
 
 with col2:
     question_type = st.selectbox(
-        "❓ What do you need help with?",
+        "Question Type",
         ["Crop Recommendation", "Pest Control", "Water Management", "Soil & Fertilizer", "Weather Advice"]
     )
 
-st.markdown("---")
-
-# ---------- LOGIC (THIS FIXES THE SAME-ANSWER BUG) ----------
+# ---------- RESPONSE DATA ----------
 responses = {
     "Maharashtra, India": {
         "Crop Recommendation": ["Soybean", "Cotton", "Bajra"],
-        "Pest Control": ["Neem oil spray", "Early leaf removal", "Light irrigation"],
-        "Water Management": ["Drip irrigation", "Morning watering", "Mulching"],
-        "Soil & Fertilizer": ["Organic compost", "Crop rotation", "Soil testing"],
-        "Weather Advice": ["Avoid sowing before heavy rain", "Harvest in dry window"]
+        "Pest Control": ["Neem oil spray", "Remove infected leaves", "Avoid overwatering"],
+        "Water Management": ["Drip irrigation", "Mulching", "Morning watering"],
+        "Soil & Fertilizer": ["Organic compost", "Soil testing", "Crop rotation"],
+        "Weather Advice": ["Avoid sowing before heavy rain", "Harvest during dry weather"]
     },
     "Punjab, India": {
         "Crop Recommendation": ["Wheat", "Rice", "Maize"],
         "Pest Control": ["Pheromone traps", "Balanced pesticide use"],
         "Water Management": ["Canal irrigation", "Laser land leveling"],
-        "Soil & Fertilizer": ["Nitrogen control", "Green manure"],
-        "Weather Advice": ["Monitor frost warnings"]
+        "Soil & Fertilizer": ["Green manure", "Nitrogen balance"],
+        "Weather Advice": ["Watch for frost warnings"]
     },
     "Ghana": {
         "Crop Recommendation": ["Maize", "Cassava", "Groundnut"],
-        "Pest Control": ["Ash-based control", "Neem extract"],
+        "Pest Control": ["Neem extract", "Ash-based control"],
         "Water Management": ["Rainwater harvesting"],
-        "Soil & Fertilizer": ["Organic mulch"],
-        "Weather Advice": ["Plant after consistent rainfall"]
+        "Soil & Fertilizer": ["Organic mulching"],
+        "Weather Advice": ["Plant after steady rainfall"]
     },
     "Canada": {
         "Crop Recommendation": ["Wheat", "Barley", "Canola"],
-        "Pest Control": ["Cold-resistant pest monitoring"],
+        "Pest Control": ["Monitor cold-resistant pests"],
         "Water Management": ["Snowmelt planning"],
-        "Soil & Fertilizer": ["Nitrogen balancing"],
-        "Weather Advice": ["Frost protection measures"]
+        "Soil & Fertilizer": ["Nitrogen management"],
+        "Weather Advice": ["Protect crops from frost"]
     }
 }
 
 # ---------- BUTTON ----------
-if st.button("⚡ Generate Smart Advice"):
+if st.button("Get Advice"):
     st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown(f"### 📊 Advice for **{location}**")
+    st.markdown(f"### {translate('Advice')} for **{location}**")
 
     advice = responses[location][question_type]
-
     for item in advice:
-        st.write("✅", item)
+        st.write("•", item)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ---------- GRAPH SECTION ----------
-    st.markdown("### 📈 Resource Impact Analysis")
-
-    data = {
+    # ---------- GRAPH ----------
+    st.markdown(f"### {translate('Resource Analysis')}")
+    df = pd.DataFrame({
         "Factor": ["Water Use", "Cost", "Risk", "Sustainability"],
-        "Score": [
-            random.randint(40, 90),
-            random.randint(40, 90),
-            random.randint(40, 90),
-            random.randint(40, 90)
-        ]
-    }
-
-    df = pd.DataFrame(data)
+        "Score": [random.randint(50, 90) for _ in range(4)]
+    })
     st.bar_chart(df.set_index("Factor"))
 
 # ---------- FOOTER ----------
 st.markdown("---")
 st.markdown(
-    "<div class='footer'>FA-2 Prototype | Smart Farm AI | Streamlit Deployment</div>",
+    "<div class='footer'>FA-2 Smart Farming Assistant | Streamlit Deployment</div>",
     unsafe_allow_html=True
 )
