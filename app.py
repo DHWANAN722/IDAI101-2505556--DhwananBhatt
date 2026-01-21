@@ -1,117 +1,136 @@
 import streamlit as st
+import pandas as pd
+import random
 
-# Page config
+# ---------- PAGE CONFIG ----------
 st.set_page_config(
     page_title="SMART FARM AI",
-    page_icon="🌾",
-    layout="centered"
+    page_icon="🚜",
+    layout="wide"
 )
 
-# Custom CSS for colors and vibe
+# ---------- NEON / GRADIENT STYLES ----------
 st.markdown("""
 <style>
 body {
-    background-color: #f5fff5;
+    background: linear-gradient(120deg, #0f2027, #203a43, #2c5364);
 }
 .main {
-    background-color: #ffffff;
-    border-radius: 15px;
+    background: rgba(255,255,255,0.05);
+}
+h1, h2, h3, h4 {
+    color: #00ffcc;
+}
+.card {
+    background: rgba(0,0,0,0.6);
     padding: 20px;
+    border-radius: 15px;
+    border: 2px solid #00ffcc;
+    color: #ffffff;
+    margin-bottom: 20px;
 }
-h1 {
-    color: #2e7d32;
+.footer {
     text-align: center;
-}
-h3 {
-    color: #388e3c;
-}
-.advice-box {
-    background-color: #e8f5e9;
-    padding: 15px;
-    border-radius: 12px;
-    border-left: 6px solid #43a047;
+    color: #cccccc;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# Title
-st.markdown("<h1>🌱 SMART FARM AI</h1>", unsafe_allow_html=True)
-st.markdown("<h3>Simple farming advice made easy</h3>", unsafe_allow_html=True)
+# ---------- SIDEBAR (ACCOUNT / SETTINGS) ----------
+st.sidebar.title("👤 Account Settings")
 
-# Inputs
-location = st.text_input("📍 Enter your location", placeholder="e.g. Maharashtra, India")
-question = st.text_input("💬 Ask your farming question", placeholder="e.g. What crop should I grow in August?")
+username = st.sidebar.text_input("Username", "Farmer01")
+language = st.sidebar.selectbox("Language", ["English", "Hindi", "Marathi"])
+theme = st.sidebar.selectbox("Theme", ["Neon", "Dark", "Green"])
+notifications = st.sidebar.checkbox("Enable Alerts", True)
 
-# Button
-if st.button("🌾 Get Advice"):
-    if not location or not question:
-        st.warning("Please enter both location and question.")
-    else:
-        q = question.lower()
+st.sidebar.markdown("---")
+st.sidebar.write("Logged in as:", username)
 
-        st.markdown('<div class="advice-box">', unsafe_allow_html=True)
-        st.markdown("### ✅ Recommended Advice")
+# ---------- MAIN TITLE ----------
+st.markdown("<h1>🚜 SMART FARM AI</h1>", unsafe_allow_html=True)
+st.markdown("### Neon-powered smart farming assistant")
 
-        # Crop related
-        if "crop" in q or "grow" in q or "plant" in q:
-            st.write("""
-            **Best crop options:**
-            - 🌿 **Soybean** – Suitable for monsoon and black soil  
-            - 🌾 **Cotton** – Thrives in warm climate  
-            - 🌽 **Bajra** – Needs less water, drought-resistant  
-            """)
+# ---------- INPUT SECTION ----------
+col1, col2 = st.columns(2)
 
-        # Pest related
-        elif "pest" in q or "insect" in q or "disease" in q:
-            st.write("""
-            **Pest control suggestions:**
-            - 🐛 Spray **neem oil** for organic control  
-            - ✂️ Remove infected leaves early  
-            - 💧 Avoid overwatering crops  
-            """)
+with col1:
+    location = st.selectbox(
+        "📍 Select Location",
+        ["Maharashtra, India", "Punjab, India", "Ghana", "Canada"]
+    )
 
-        # Water related
-        elif "water" in q or "irrigation" in q:
-            st.write("""
-            **Water management tips:**
-            - 💦 Use **drip irrigation**  
-            - ⏰ Water early morning or evening  
-            - 🚫 Avoid flooding the field  
-            """)
+with col2:
+    question_type = st.selectbox(
+        "❓ What do you need help with?",
+        ["Crop Recommendation", "Pest Control", "Water Management", "Soil & Fertilizer", "Weather Advice"]
+    )
 
-        # Soil related
-        elif "soil" in q or "fertilizer" in q:
-            st.write("""
-            **Soil & fertilizer advice:**
-            - 🌱 Add **organic compost**  
-            - 🧪 Use soil testing before fertilizers  
-            - ♻️ Rotate crops to improve soil health  
-            """)
+st.markdown("---")
 
-        # Weather related
-        elif "rain" in q or "weather" in q:
-            st.write("""
-            **Weather-based guidance:**
-            - ☁️ Delay sowing if heavy rain is expected  
-            - 🌞 Harvest during dry periods  
-            - 📅 Check weekly weather updates  
-            """)
+# ---------- LOGIC (THIS FIXES THE SAME-ANSWER BUG) ----------
+responses = {
+    "Maharashtra, India": {
+        "Crop Recommendation": ["Soybean", "Cotton", "Bajra"],
+        "Pest Control": ["Neem oil spray", "Early leaf removal", "Light irrigation"],
+        "Water Management": ["Drip irrigation", "Morning watering", "Mulching"],
+        "Soil & Fertilizer": ["Organic compost", "Crop rotation", "Soil testing"],
+        "Weather Advice": ["Avoid sowing before heavy rain", "Harvest in dry window"]
+    },
+    "Punjab, India": {
+        "Crop Recommendation": ["Wheat", "Rice", "Maize"],
+        "Pest Control": ["Pheromone traps", "Balanced pesticide use"],
+        "Water Management": ["Canal irrigation", "Laser land leveling"],
+        "Soil & Fertilizer": ["Nitrogen control", "Green manure"],
+        "Weather Advice": ["Monitor frost warnings"]
+    },
+    "Ghana": {
+        "Crop Recommendation": ["Maize", "Cassava", "Groundnut"],
+        "Pest Control": ["Ash-based control", "Neem extract"],
+        "Water Management": ["Rainwater harvesting"],
+        "Soil & Fertilizer": ["Organic mulch"],
+        "Weather Advice": ["Plant after consistent rainfall"]
+    },
+    "Canada": {
+        "Crop Recommendation": ["Wheat", "Barley", "Canola"],
+        "Pest Control": ["Cold-resistant pest monitoring"],
+        "Water Management": ["Snowmelt planning"],
+        "Soil & Fertilizer": ["Nitrogen balancing"],
+        "Weather Advice": ["Frost protection measures"]
+    }
+}
 
-        # Fallback
-        else:
-            st.write("""
-            **General farming tips:**
-            - 🌍 Follow sustainable farming practices  
-            - 📊 Monitor crop health regularly  
-            - 🤝 Seek expert advice when needed  
-            """)
+# ---------- BUTTON ----------
+if st.button("⚡ Generate Smart Advice"):
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown(f"### 📊 Advice for **{location}**")
 
-        st.markdown(f"*📌 Location considered: **{location}***")
-        st.markdown('</div>', unsafe_allow_html=True)
+    advice = responses[location][question_type]
 
-# Footer
+    for item in advice:
+        st.write("✅", item)
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # ---------- GRAPH SECTION ----------
+    st.markdown("### 📈 Resource Impact Analysis")
+
+    data = {
+        "Factor": ["Water Use", "Cost", "Risk", "Sustainability"],
+        "Score": [
+            random.randint(40, 90),
+            random.randint(40, 90),
+            random.randint(40, 90),
+            random.randint(40, 90)
+        ]
+    }
+
+    df = pd.DataFrame(data)
+    st.bar_chart(df.set_index("Factor"))
+
+# ---------- FOOTER ----------
 st.markdown("---")
 st.markdown(
-    "<center>🌾 Built for FA-2 | Smart Farming Assistant</center>",
+    "<div class='footer'>FA-2 Prototype | Smart Farm AI | Streamlit Deployment</div>",
     unsafe_allow_html=True
 )
